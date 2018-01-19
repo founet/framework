@@ -3,10 +3,12 @@
 namespace Symplex;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+
 
 /**
  * Created by PhpStorm.
@@ -17,8 +19,8 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 class Framework
 {
 
-    private $controllerResolver;
-    private $argumentResolver;
+    protected $controllerResolver;
+    protected $argumentResolver;
     private $matcher;
 
     public function __construct(ControllerResolver $controllerResolver, ArgumentResolver $argumentResolver, UrlMatcher $matcher)
@@ -30,12 +32,11 @@ class Framework
 
     public function handle(Request $request)
     {
+        $this->matcher->getContext()->fromRequest($request);
+
         try {
-
-            $this->matcher->getContext()->fromRequest($request);
-
+            $request->attributes->add($this->matcher->match($request->getPathInfo()));
             $controller = $this->controllerResolver->getController($request);
-
             $arguments = $this->argumentResolver->getArguments($request, $controller);
 
            return call_user_func_array($controller, $arguments);

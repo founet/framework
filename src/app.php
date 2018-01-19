@@ -1,7 +1,6 @@
 <?php
 
 use Symfony\Component\Routing;
-require_once 'LeapYearController.php';
 
 $routes = new Routing\RouteCollection();
 
